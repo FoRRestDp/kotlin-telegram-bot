@@ -46,5 +46,5 @@ fun main() {
                 )
             }
         }
-    }.startPolling()
+    }.startPolling(wait = true)
 }

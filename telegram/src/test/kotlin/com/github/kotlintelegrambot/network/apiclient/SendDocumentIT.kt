@@ -6,9 +6,6 @@ import anyMessage
 import anyUser
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.MessageEntity
-import com.github.kotlintelegrambot.entities.MessageEntity.Type.ITALIC
 import com.github.kotlintelegrambot.entities.ParseMode.MARKDOWN_V2
 import com.github.kotlintelegrambot.entities.TelegramFile
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
@@ -18,15 +15,18 @@ import com.github.kotlintelegrambot.testutils.getFileAsStringFromResources
 import com.github.kotlintelegrambot.testutils.getFileFromResources
 import com.github.kotlintelegrambot.testutils.multipartBoundary
 import com.google.gson.Gson
-import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SendDocumentIT : ApiClientIT() {
     private fun String.normalizeLineEndings() = this.replace(Regex("\\r\\n?"), "\n")
 
     @Test
-    fun `#sendDocument using all params with documentId creates request correctly`() {
+    fun `#sendDocument using all params with documentId creates request correctly`() = runTest {
         givenAnySendDocumentResponse()
 
         sut.sendDocument(
@@ -39,7 +39,7 @@ class SendDocumentIT : ApiClientIT() {
             replyToMessageId = REPLY_TO_MESSAGE_ID,
             allowSendingWithoutReply = null,
             replyMarkup = REPLY_MARKUP
-        ).execute()
+        )
 
         val request = mockWebServer.takeRequest()
         val expectedRequestBody = "chat_id=$ANY_CHAT_ID" +
@@ -55,7 +55,7 @@ class SendDocumentIT : ApiClientIT() {
     }
 
     @Test
-    fun `#sendDocument using all params with document file creates request correctly`() {
+    fun `#sendDocument using all params with document file creates request correctly`() = runTest {
         givenAnySendDocumentResponse()
 
         sut.sendDocument(
@@ -68,7 +68,7 @@ class SendDocumentIT : ApiClientIT() {
             replyToMessageId = REPLY_TO_MESSAGE_ID,
             allowSendingWithoutReply = null,
             replyMarkup = REPLY_MARKUP
-        ).execute()
+        )
 
         val request = mockWebServer.takeRequest()
         val multipartBoundary = request.multipartBoundary
@@ -79,11 +79,14 @@ class SendDocumentIT : ApiClientIT() {
             String(getFileFromResources<SendDocumentIT>(DOCUMENT_FILE_NAME).readBytes()),
             DOCUMENT_FILE_NAME
         )
-        assertEquals(expectedRequestBody.normalizeLineEndings(), requestBody.normalizeLineEndings())
+        assertEquals(
+            expectedRequestBody.normalizeLineEndings(),
+            requestBody.normalizeLineEndings()
+        )
     }
 
     @Test
-    fun `#sendDocument using all params with document from ByteArray creates request correctly`() {
+    fun `#sendDocument using all params with document from ByteArray creates request correctly`() = runTest {
         givenAnySendDocumentResponse()
 
         sut.sendDocument(
@@ -97,7 +100,7 @@ class SendDocumentIT : ApiClientIT() {
             allowSendingWithoutReply = null,
             replyMarkup = REPLY_MARKUP,
             mimeType = "application/pdf"
-        ).execute()
+        )
 
         val request = mockWebServer.takeRequest()
         val multipartBoundary = request.multipartBoundary
@@ -108,17 +111,20 @@ class SendDocumentIT : ApiClientIT() {
             String(getFileFromResources<SendDocumentIT>(DOCUMENT_FILE_NAME).readBytes()),
             DOCUMENT_FILE_NAME
         )
-        assertEquals(expectedRequestBody.normalizeLineEndings(), requestBody.normalizeLineEndings())
+        assertEquals(
+            expectedRequestBody.normalizeLineEndings(),
+            requestBody.normalizeLineEndings()
+        )
     }
 
     @Test
-    fun `#sendDocument using required params only with documentId creates request correctly`() {
+    fun `#sendDocument using required params only with documentId creates request correctly`() = runTest {
         givenAnySendDocumentResponse()
 
         sut.sendDocument(
             ChatId.fromId(ANY_CHAT_ID),
             TelegramFile.ByFileId(ANY_DOCUMENT_FILE_ID)
-        ).execute()
+        )
 
         val request = mockWebServer.takeRequest()
         val expectedRequestBody = "chat_id=$ANY_CHAT_ID" +
@@ -128,19 +134,22 @@ class SendDocumentIT : ApiClientIT() {
     }
 
     @Test
-    fun `#sendDocument with required parameters returns response correctly`() {
+    fun `#sendDocument with required parameters returns response correctly`() = runTest {
         givenAnySendDocumentResponse()
 
         val sendDocument = sut.sendDocument(
             ChatId.fromId(ANY_CHAT_ID),
             TelegramFile.ByFileId(ANY_DOCUMENT_FILE_ID)
-        ).execute()
+        )
 
-        assertEquals(anyDocumentMessage.toString().trim(), sendDocument.body()?.result.toString().trim())
+        assertEquals(
+            anyDocumentMessage.toString().trim(),
+            sendDocument.body()?.result.toString().trim()
+        )
     }
 
     private fun givenAnySendDocumentResponse() {
-        val sendDocumentResponse = Response<Message>(
+        val sendDocumentResponse = Response(
             ok = true,
             result = anyDocumentMessage
         )
@@ -159,7 +168,6 @@ class SendDocumentIT : ApiClientIT() {
         const val REPLY_TO_MESSAGE_ID = 32235235L
         const val CAPTION = "Caption"
         const val ANY_FILE_SIZE = 2897253
-        val CAPTION_ENTITIES = listOf(MessageEntity(ITALIC, 0, 3))
         val REPLY_MARKUP = InlineKeyboardMarkup.create(
             listOf(
                 InlineKeyboardButton.CallbackData(

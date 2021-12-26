@@ -12,10 +12,10 @@ import io.ktor.request.receiveText
 import io.ktor.response.respond
 import io.ktor.routing.post
 import io.ktor.routing.routing
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
-import io.ktor.server.netty.Netty
 import java.io.File
 
 object MyBotConfig {
@@ -66,5 +66,5 @@ fun main() {
         }
     }
 
-    embeddedServer(Netty, env).start(wait = true)
+    embeddedServer(CIO, env).start(wait = true)
 }
