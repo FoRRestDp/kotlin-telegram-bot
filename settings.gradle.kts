@@ -3,14 +3,14 @@
 rootProject.name = "kotlin-telegram-bot"
 
 include(":telegram")
-if (!System.getenv("JITPACK").toBoolean()){
+if (!System.getenv("JITPACK").toBoolean()) {
     include(":echo", ":dispatcher", ":polls", ":webhook")
-}
 
-project(":echo").projectDir = File(rootDir, "samples/echo")
-project(":dispatcher").projectDir = File(rootDir, "samples/dispatcher")
-project(":polls").projectDir = File(rootDir, "samples/polls")
-project(":webhook").projectDir = File(rootDir, "samples/webhook")
+    project(":echo").projectDir = File(rootDir, "samples/echo")
+    project(":dispatcher").projectDir = File(rootDir, "samples/dispatcher")
+    project(":polls").projectDir = File(rootDir, "samples/polls")
+    project(":webhook").projectDir = File(rootDir, "samples/webhook")
+}
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -47,7 +47,8 @@ dependencyResolutionManagement {
 
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef(kotlin)
             plugin("atomicfu", "org.jetbrains.kotlin.plugin.atomicfu").versionRef(kotlin)
-            plugin("compatabilityValidator", "org.jetbrains.kotlinx.binary-compatibility-validator").versionRef(compatabilityValidator)
+            plugin("compatabilityValidator", "org.jetbrains.kotlinx.binary-compatibility-validator").versionRef(
+                compatabilityValidator)
 
             library("retrofit-core", retrofitGroup, "retrofit").versionRef(retrofit)
             library("retrofit-converterGson", retrofitGroup, "converter-gson").versionRef(retrofit)
