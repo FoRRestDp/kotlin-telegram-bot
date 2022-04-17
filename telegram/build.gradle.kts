@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.github.forrestdp.kotlintelegrambot"
-version = "7.0.0"
+version = "8.0.0-alpha01"
 
 java {
     withSourcesJar()
@@ -67,7 +67,7 @@ publishing {
             from(components["java"])
             group = "com.github.forrestdp"
             artifactId = "kotlintelegrambot-coroutines"
-            version = "1.0.0"
+            version = "8.0.0-alpha01"
 
             pom.name.set("Kotlin Telegram Bot Coroutines")
         }

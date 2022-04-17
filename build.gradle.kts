@@ -9,7 +9,7 @@ allprojects {
     apply(from = "$rootDir/ktlint.gradle")
 
     group = "com.github.forrestdp.kotlintelegrambot"
-    version = "7.0.0"
+    version = "8.0.0-alpha01"
 
     tasks.withType<KotlinCompile> {
         kotlinOptions.freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
