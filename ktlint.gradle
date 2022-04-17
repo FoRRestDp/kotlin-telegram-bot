@@ -1,9 +1,5 @@
 apply plugin: 'java'
 
-repositories {
-    mavenCentral()
-}
-
 configurations {
     ktlint
 }

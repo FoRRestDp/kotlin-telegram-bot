@@ -1,17 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    
-    dependencies { 
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.0")
-    }
-}
-
 plugins {
-    kotlin("jvm") version "1.6.10"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.atomicfu) apply false
 }
 
 allprojects {
@@ -20,21 +11,7 @@ allprojects {
     group = "com.github.forrestdp.kotlintelegrambot"
     version = "7.0.0"
 
-    repositories {
-        mavenCentral()
-    }
-    
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-        }
+        kotlinOptions.freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
     }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 }

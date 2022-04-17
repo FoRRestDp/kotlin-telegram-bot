@@ -1,22 +1,17 @@
 plugins {
-    kotlin("jvm")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin)
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation(project(":telegram"))
+    implementation(libs.coroutines.core)
+    implementation(projects.telegram)
 }
 
 tasks.jar {
     manifest {
-        attributes(mapOf("Main-Class" to "com.github.kotlintelegrambot.MainKt"))
+        attributes("Main-Class" to "com.github.kotlintelegrambot.MainKt")
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from({ configurations.getByName("compileClasspath").map { if (it.isDirectory) it else zipTree(it) } })
+    from({ configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
 }

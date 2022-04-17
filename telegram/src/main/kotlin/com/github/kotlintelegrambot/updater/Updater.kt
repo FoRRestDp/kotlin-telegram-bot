@@ -15,12 +15,12 @@ internal class Updater(
     private val botTimeout: Int,
 ) {
 
-    private val lastUpdateId = atomic<Long?>(null)
+    private var lastUpdateId by atomic<Long?>(null)
 
     internal fun launchPolling() {
         looper.launchLoop {
             val getUpdatesResult = apiClient.getUpdates(
-                offset = lastUpdateId.value,
+                offset = lastUpdateId,
                 limit = null,
                 timeout = botTimeout,
                 allowedUpdates = null,
@@ -48,7 +48,7 @@ internal class Updater(
 
         updates.forEach { updatesQueue.send(it) }
 
-        lastUpdateId.value = updates.last().updateId + 1
+        lastUpdateId = updates.last().updateId + 1
     }
 
     private suspend fun onErrorGettingUpdates(error: TelegramBotResult.Error<List<Update>>) {
