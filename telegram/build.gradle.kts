@@ -4,13 +4,32 @@ plugins {
     alias(libs.plugins.compatabilityValidator)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.atomicfu)
+    `maven-publish`
+    java
 }
 
 group = "com.github.forrestdp.kotlintelegrambot"
 version = "7.0.0"
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 kotlin {
     explicitApi = ExplicitApiMode.Strict
+}
+
+tasks.compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -32,24 +51,30 @@ dependencies {
     testImplementation(libs.coroutines.test)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
-    dependsOn(tasks.classes.get())
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
+//val sourcesJar by tasks.creating(Jar::class) {
+//    dependsOn(tasks.classes.get())
+//    archiveClassifier.set("sources")
+//    from(sourceSets.main.get().allSource)
+//}
+//
+//artifacts {
+//    archives(sourcesJar)
+//}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            group = "com.github.forrestdp"
+            artifactId = "kotlintelegrambot-coroutines"
+            version = "1.0.0"
+
+            pom.name.set("Kotlin Telegram Bot Coroutines")
+        }
+    }
 }
 
-artifacts {
-    archives(sourcesJar)
-}
-
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.test {
-    useJUnitPlatform()
+tasks.create<Wrapper>("wrapper") {
+    gradleVersion = "7.4.2"
+    distributionType = Wrapper.DistributionType.ALL
 }
