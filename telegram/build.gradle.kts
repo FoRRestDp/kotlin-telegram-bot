@@ -1,68 +1,53 @@
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.7.1"
-    kotlin("jvm")
+    alias(libs.plugins.compatabilityValidator)
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.atomicfu)
 }
-
-apply(plugin = "kotlinx-atomicfu")
 
 group = "com.github.forrestdp.kotlintelegrambot"
 version = "7.0.0"
-
-repositories {
-    mavenCentral()
-}
 
 kotlin {
     explicitApi = ExplicitApiMode.Strict
 }
 
 dependencies {
-    // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-
     // Networking
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converterGson)
 
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation(libs.okhttp.loggingInterceptor)
+
+    implementation(libs.coroutines.core)
+
+    implementation(libs.atomicfu.core)
 
     // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
-    testImplementation("org.assertj:assertj-core:3.21.0")
-    testImplementation("io.mockk:mockk:1.12.1")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    testImplementation(libs.bundles.junit)
+    testImplementation(libs.assertj.core)
+    testImplementation(libs.mockk.core)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.coroutines.test)
 }
 
-tasks.create<Jar>("sourcesJar") {
-    dependsOn("classes")
+val sourcesJar by tasks.creating(Jar::class) {
+    dependsOn(tasks.classes.get())
     archiveClassifier.set("sources")
-    from(sourceSets.getByName("main").allSource)
+    from(sourceSets.main.get().allSource)
 }
 
 artifacts {
-    archives(tasks.getByName("sourcesJar"))
+    archives(sourcesJar)
 }
 
-java.sourceSets["main"].java {
-    srcDirs("src/main/kotlin")
+tasks.compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
-val compileKotlin: KotlinCompile by tasks
-val compileTestKotlin: KotlinCompile by tasks
-
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+tasks.compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 tasks.test {

@@ -1,23 +1,22 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin)
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("io.ktor:ktor-server-cio:1.6.4")
-    implementation(project(":telegram"))
+    implementation(libs.ktor.serverCio)
+    implementation(projects.telegram)
 }
 
-tasks.create<JavaExec>("runApp") {
-    classpath = sourceSets.getByName("main").runtimeClasspath
+val runApp by tasks.creating(JavaExec::class) {
+    classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("com.github.kotlintelegrambot.webhook.MainKt")
 }
 
 tasks.jar {
     manifest {
-        attributes(mapOf("Main-Class" to "com.github.kotlintelegrambot.MainKt"))
+        attributes("Main-Class" to "com.github.kotlintelegrambot.MainKt")
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from({ configurations.getByName("compileClasspath").map { if (it.isDirectory) it else zipTree(it) } })
+    from({ configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
 }
