@@ -2,7 +2,10 @@
 
 rootProject.name = "kotlin-telegram-bot"
 
-include(":telegram", ":echo", ":dispatcher", ":polls", ":webhook")
+include(":telegram")
+if (!System.getenv("JITPACK").toBoolean()){
+    include(":echo", ":dispatcher", ":polls", ":webhook")
+}
 
 project(":echo").projectDir = File(rootDir, "samples/echo")
 project(":dispatcher").projectDir = File(rootDir, "samples/dispatcher")

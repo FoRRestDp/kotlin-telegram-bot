@@ -8,9 +8,6 @@ plugins {
     java
 }
 
-group = "com.github.forrestdp.kotlintelegrambot"
-version = "8.0.0-alpha01"
-
 java {
     withSourcesJar()
     withJavadocJar()
@@ -64,10 +61,10 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            group = project.group
+            artifactId = project.name
+            version = project.version.toString()
             from(components["java"])
-            group = "com.github.forrestdp"
-            artifactId = "kotlintelegrambot-coroutines"
-            version = "8.0.0-alpha01"
 
             pom.name.set("Kotlin Telegram Bot Coroutines")
         }
