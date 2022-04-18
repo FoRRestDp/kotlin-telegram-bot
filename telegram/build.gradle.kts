@@ -1,5 +1,4 @@
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-
+@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.compatabilityValidator)
     alias(libs.plugins.kotlin)
@@ -14,7 +13,7 @@ java {
 }
 
 kotlin {
-    explicitApi = ExplicitApiMode.Strict
+    explicitApi()
 }
 
 tasks.compileKotlin {
