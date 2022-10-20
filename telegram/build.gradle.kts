@@ -47,15 +47,15 @@ dependencies {
     testImplementation(libs.coroutines.test)
 }
 
-//val sourcesJar by tasks.creating(Jar::class) {
-//    dependsOn(tasks.classes.get())
-//    archiveClassifier.set("sources")
-//    from(sourceSets.main.get().allSource)
-//}
-//
-//artifacts {
-//    archives(sourcesJar)
-//}
+val sourcesJar by tasks.getting(Jar::class) {
+    dependsOn(tasks.classes.get())
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+artifacts {
+    archives(sourcesJar)
+}
 
 publishing {
     publications {
@@ -71,6 +71,6 @@ publishing {
 }
 
 tasks.create<Wrapper>("wrapper") {
-    gradleVersion = "7.4.2"
+    gradleVersion = "7.5.1"
     distributionType = Wrapper.DistributionType.ALL
 }

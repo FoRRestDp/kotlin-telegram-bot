@@ -29,11 +29,11 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            val kotlin = version("kotlin", "1.6.20")
+            val kotlin = version("kotlin", "1.7.20")
             val retrofit = version("retrofit", "2.9.0")
             val okhttp = version("okhttp", "4.9.3")
             val coroutines = version("coroutines", "1.6.1")
-            val ktor = version("ktor", "2.0.0")
+            val ktor = version("ktor", "2.1.2")
             val assertj = version("assertj", "3.22.0")
             val mockk = version("mockk", "1.12.3")
             val atomicfu = version("atomicfu", "0.17.2")
