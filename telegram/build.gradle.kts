@@ -14,14 +14,7 @@ java {
 
 kotlin {
     explicitApi()
-}
-
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    jvmToolchain(8)
 }
 
 tasks.test {

@@ -28,17 +28,17 @@ dependencyResolutionManagement {
         mavenCentral()
     }
     versionCatalogs {
-        create("libs") {
-            val kotlin = version("kotlin", "1.7.20")
+        register("libs") {
+            val kotlin = version("kotlin", "1.8.10")
             val retrofit = version("retrofit", "2.9.0")
-            val okhttp = version("okhttp", "4.9.3")
-            val coroutines = version("coroutines", "1.6.1")
-            val ktor = version("ktor", "2.1.2")
-            val assertj = version("assertj", "3.22.0")
-            val mockk = version("mockk", "1.12.3")
-            val atomicfu = version("atomicfu", "0.17.2")
-            val junit = version("junit", "5.8.2")
-            val compatabilityValidator = version("compatabilityValidator", "0.8.0")
+            val okhttp = version("okhttp", "4.10.0")
+            val coroutines = version("coroutines", "1.6.4")
+            val ktor = version("ktor", "2.2.4")
+            val assertj = version("assertj", "3.24.2")
+            val mockk = version("mockk", "1.13.4")
+            val atomicfu = version("atomicfu", "0.20.0")
+            val junit = version("junit", "5.9.2")
+            val compatabilityValidator = version("compatabilityValidator", "0.13.0")
 
             val kotlinxGroup = "org.jetbrains.kotlinx"
             val retrofitGroup = "com.squareup.retrofit2"
