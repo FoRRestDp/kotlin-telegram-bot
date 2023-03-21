@@ -70,7 +70,7 @@ publishing {
     }
 }
 
-tasks.create<Wrapper>("wrapper") {
-    gradleVersion = "7.5.1"
+tasks.register<Wrapper>("wrapper") {
+    gradleVersion = "8.0.2"
     distributionType = Wrapper.DistributionType.ALL
 }
