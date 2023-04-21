@@ -8,10 +8,11 @@ public class WebhookConfigBuilder {
     public var ipAddress: String? = null
     public var maxConnections: Int? = null
     public var allowedUpdates: List<String>? = null
+    public var dropPendingUpdates: Boolean? = null
 
     internal fun build(): WebhookConfig {
         val finalUrl = url ?: error("You must provide a url for the webhook")
-        return WebhookConfig(finalUrl, certificate, ipAddress, maxConnections, allowedUpdates)
+        return WebhookConfig(finalUrl, certificate, ipAddress, maxConnections, allowedUpdates, dropPendingUpdates)
     }
 }
 
@@ -20,5 +21,6 @@ public data class WebhookConfig(
     val certificate: TelegramFile? = null,
     val ipAddress: String? = null,
     val maxConnections: Int? = null,
-    val allowedUpdates: List<String>? = null
+    val allowedUpdates: List<String>? = null,
+    val dropPendingUpdates: Boolean? = null
 )

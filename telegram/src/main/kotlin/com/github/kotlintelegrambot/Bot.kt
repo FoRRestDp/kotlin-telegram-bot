@@ -39,6 +39,7 @@ import com.github.kotlintelegrambot.network.serialization.GsonFactory
 import com.github.kotlintelegrambot.types.DispatchableObject
 import com.github.kotlintelegrambot.types.TelegramBotResult
 import com.github.kotlintelegrambot.updater.SuspendLooper
+import com.github.kotlintelegrambot.updater.CoroutineLooper
 import com.github.kotlintelegrambot.updater.Updater
 import com.github.kotlintelegrambot.webhook.WebhookConfig
 import com.github.kotlintelegrambot.webhook.WebhookConfigBuilder
@@ -46,6 +47,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import java.net.Proxy
 import java.io.File as SystemFile
 
@@ -147,8 +150,8 @@ public class Bot private constructor(
                 webhookConfig.certificate,
                 webhookConfig.ipAddress,
                 webhookConfig.maxConnections,
-                webhookConfig.allowedUpdates
-            )
+                webhookConfig.allowedUpdates,
+            webhookConfig.dropPendingUpdates)
         }
         val webhookSet = setWebhookResult.bimap(
             mapResponse = { true },
@@ -156,7 +159,7 @@ public class Bot private constructor(
         )
 
         if (webhookSet) {
-            dispatcher.launchCheckingUpdates()
+            dispatcher.startCheckingUpdates()
         }
 
         return webhookSet
@@ -171,7 +174,7 @@ public class Bot private constructor(
             error("To stop a webhook you need to configure it on bot set up. Check the `webhook` builder function")
         }
 
-        dispatcher.cancelCheckingUpdates()
+        dispatcher.stopCheckingUpdates()
 
         val deleteWebhookResult = deleteWebhook()
 
@@ -223,13 +226,16 @@ public class Bot private constructor(
         ipAddress: String? = null,
         maxConnections: Int? = null,
         allowedUpdates: List<String>? = null,
+        dropPendingUpdates: Boolean? = null
     ): Pair<CallResponse<Response<Boolean>?>?, Exception?> = call {
-        apiClient.setWebhook(url, certificate, ipAddress, maxConnections, allowedUpdates)
+        apiClient.setWebhook(url, certificate, ipAddress, maxConnections, allowedUpdates, dropPendingUpdates)
     }
 
     @Suppress("UNCHECKED_CAST")
-    public suspend fun deleteWebhook(): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
-        call { apiClient.deleteWebhook() }
+    public suspend fun deleteWebhook(
+        dropPendingUpdates: Boolean? = null
+    ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
+        call { apiClient.deleteWebhook(dropPendingUpdates) }
 
     public suspend fun getWebhookInfo(): Pair<CallResponse<Response<WebhookInfo>?>?, Exception?> =
         call { apiClient.getWebhookInfo() }
@@ -1049,6 +1055,7 @@ public class Bot private constructor(
         replyToMessageId: Long? = null,
         allowSendingWithoutReply: Boolean? = null,
         replyMarkup: ReplyMarkup? = null,
+        proximityAlertRadius: Int? = null
     ): Pair<CallResponse<Response<Message>?>?, Exception?> = call {
         apiClient.sendLocation(
             chatId,
@@ -1058,7 +1065,8 @@ public class Bot private constructor(
             disableNotification,
             replyToMessageId,
             allowSendingWithoutReply,
-            replyMarkup
+            replyMarkup,
+        proximityAlertRadius
         )
     }
 
@@ -1141,6 +1149,7 @@ public class Bot private constructor(
         latitude: Float,
         longitude: Float,
         replyMarkup: ReplyMarkup? = null,
+        proximityAlertRadius: Int? = null
     ): Pair<CallResponse<Response<Message>?>?, Exception?> = call {
         apiClient.editMessageLiveLocation(
             chatId,
@@ -1148,7 +1157,8 @@ public class Bot private constructor(
             inlineMessageId,
             latitude,
             longitude,
-            replyMarkup
+            replyMarkup,
+        proximityAlertRadius
         )
     }
 
@@ -1174,6 +1184,8 @@ public class Bot private constructor(
         address: String,
         foursquareId: String? = null,
         foursquareType: String? = null,
+        googlePlaceId: String? = null,
+        googlePlaceType: String? = null,
         disableNotification: Boolean? = null,
         replyToMessageId: Long? = null,
         allowSendingWithoutReply: Boolean? = null,
@@ -1187,7 +1199,8 @@ public class Bot private constructor(
             address,
             foursquareId,
             foursquareType,
-            disableNotification,
+            googlePlaceId,
+        googlePlaceType,disableNotification,
             replyToMessageId,
             allowSendingWithoutReply,
             replyMarkup
@@ -1216,11 +1229,23 @@ public class Bot private constructor(
         )
     }
 
+    /**
+     * Use this method when you need to tell the user that something is happening on the bot's side.
+     * The status is set for 5 seconds or less (when a message arrives from your bot, Telegram
+     * clients clear its typing status).
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in
+     * the format @channelusername).
+     * @param action Type of [ChatAction] to broadcast. Choose one depending on what the user is
+     * about to receive.
+     *
+     * @return True on success.
+     */
     public suspend fun sendChatAction(
         chatId: ChatId,
         action: ChatAction,
-    ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
-        call { apiClient.sendChatAction(chatId, action) }
+    ): TelegramBotResult<Boolean> =
+        apiClient.sendChatAction(chatId, action)
 
     public suspend fun getUserProfilePhotos(
         userId: Long,
@@ -1372,12 +1397,30 @@ public class Bot private constructor(
     ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
         call { apiClient.setChatDescription(chatId, description) }
 
+    fun setChatDescription(chatId: ChatId, description: String) =
+        call {apiClient.setChatDescription(chatId, description) }
+    
+    /**
+     * Use this method to add a message to the list of pinned messages in a chat. IF the chat is
+     * not a private chat, the bot must be an administrator in the chat for this to work and must
+     * have the `can_pin_messages` administrator right in a supergroup or `can_edit_messages`
+     * administrator right in a channel.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in
+     * the format @channelusername)
+     * @param messageId Identifier of the message to pin.
+     * @param disableNotification Pass True if it is not necessary to send a notification to all
+     * chat members about the new pinned message. Notifications are always disabled in channels
+     * and private chats.
+     *
+     * @return True on success.
+     */
     public suspend fun pinChatMessage(
         chatId: ChatId,
         messageId: Long,
         disableNotification: Boolean? = null,
-    ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
-        call { apiClient.pinChatMessage(chatId, messageId, disableNotification) }
+    ): TelegramBotResult<Boolean> =
+        apiClient.pinChatMessage(chatId, messageId, disableNotification)
 
     /**
      * Use this method to remove a message from the list of pinned messages in a chat. If the chat
@@ -1412,8 +1455,16 @@ public class Bot private constructor(
         chatId: ChatId,
     ): TelegramBotResult<Boolean> = apiClient.unpinAllChatMessages(chatId)
 
-    public suspend fun leaveChat(chatId: ChatId): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
-        call { apiClient.leaveChat(chatId) }
+    /**
+     * Use this method for your bot to leave a group, supergroup or channel.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target supergroup or
+     * channel (in the format @channelusername).
+     *
+     * @return True on success.
+     */
+    public suspend fun leaveChat(chatId: ChatId): TelegramBotResult<Boolean> =
+        apiClient.leaveChat(chatId)
 
     /**
      * Use this method to get up-to-date information about the chat (current name of the user
@@ -1540,6 +1591,16 @@ public class Bot private constructor(
 
     public suspend fun logOut(): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
         call { apiClient.logOut() }
+
+    /**
+     * Use this method to close the bot instance before moving it from one local server to another. You need to delete the webhook
+     * before calling this method to ensure that the bot isn't launched again after server restart. The method will return error
+     * 429 in the first 10 minutes after the bot is launched.
+     *
+     * @return True on success
+     * */
+
+    fun close() = apiClient.close().call()
 
     /**
      * Updating messages

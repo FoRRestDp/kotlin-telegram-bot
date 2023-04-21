@@ -53,7 +53,8 @@ internal interface ApiService {
         @Field(ApiConstants.SetWebhook.URL) url: String,
         @Field(ApiConstants.SetWebhook.IP_ADDRESS) ipAddress: String? = null,
         @Field(ApiConstants.SetWebhook.MAX_CONNECTIONS) maxConnections: Int? = null,
-        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null
+        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null,
+        @Field(ApiConstants.SetWebhook.DROP_PENDING_UPDATES) dropPendingUpdates: Boolean? = null
     ): CallResponse<Response<Boolean>>
 
     @FormUrlEncoded
@@ -63,7 +64,8 @@ internal interface ApiService {
         @Field(ApiConstants.SetWebhook.CERTIFICATE) certificateFileId: String,
         @Field(ApiConstants.SetWebhook.IP_ADDRESS) ipAddress: String? = null,
         @Field(ApiConstants.SetWebhook.MAX_CONNECTIONS) maxConnections: Int? = null,
-        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null
+        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null,
+        @Field(ApiConstants.SetWebhook.DROP_PENDING_UPDATES) dropPendingUpdates: Boolean? = null
     ): CallResponse<Response<Boolean>>
 
     @FormUrlEncoded
@@ -73,7 +75,8 @@ internal interface ApiService {
         @Field(ApiConstants.SetWebhook.CERTIFICATE) certificateUrl: String,
         @Field(ApiConstants.SetWebhook.IP_ADDRESS) ipAddress: String? = null,
         @Field(ApiConstants.SetWebhook.MAX_CONNECTIONS) maxConnections: Int? = null,
-        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null
+        @Field(ApiConstants.SetWebhook.ALLOWED_UPDATES) allowedUpdates: List<String>? = null,
+        @Field(ApiConstants.SetWebhook.DROP_PENDING_UPDATES) dropPendingUpdates: Boolean? = null
     ): CallResponse<Response<Boolean>>
 
     @Multipart
@@ -83,11 +86,14 @@ internal interface ApiService {
         @Part certificate: MultipartBody.Part,
         @Part ipAddress: MultipartBody.Part? = null,
         @Part maxConnections: MultipartBody.Part? = null,
-        @Part allowedUpdates: MultipartBody.Part? = null
+        @Part allowedUpdates: MultipartBody.Part? = null,
+        @Part dropPendingUpdates: MultipartBody.Part? = null
     ): CallResponse<Response<Boolean>>
 
     @GET("deleteWebhook")
-    suspend fun deleteWebhook(): CallResponse<Response<Boolean>>
+    suspend fun deleteWebhook(
+        @Query(ApiConstants.SetWebhook.DROP_PENDING_UPDATES) dropPendingUpdates: Boolean? = null
+    ): CallResponse<Response<Boolean>>
 
     @GET("getWebhookInfo")
     suspend fun getWebhookInfo(): CallResponse<Response<WebhookInfo>>
@@ -361,7 +367,8 @@ internal interface ApiService {
         @Field(ApiConstants.DISABLE_NOTIFICATION) disableNotification: Boolean?,
         @Field(ApiConstants.REPLY_TO_MESSAGE_ID) replyToMessageId: Long?,
         @Field(ApiConstants.ALLOW_SENDING_WITHOUT_REPLY) allowSendingWithoutReply: Boolean?,
-        @Field(ApiConstants.REPLY_MARKUP) replyMarkup: ReplyMarkup? = null
+        @Field(ApiConstants.REPLY_MARKUP) replyMarkup: ReplyMarkup? = null,
+        @Field("proximity_alert_radius") proximityAlertRadius: Int? = null
     ): CallResponse<Response<Message>>
 
     @FormUrlEncoded
@@ -372,7 +379,8 @@ internal interface ApiService {
         @Field("inline_message_id") inlineMessageId: String?,
         @Field("latitude") latitude: Float,
         @Field("longitude") longitude: Float,
-        @Field(ApiConstants.REPLY_MARKUP) replyMarkup: ReplyMarkup? = null
+        @Field(ApiConstants.REPLY_MARKUP) replyMarkup: ReplyMarkup? = null,
+        @Field("proximity_alert_radius") proximityAlertRadius: Int? = null
     ): CallResponse<Response<Message>>
 
     @FormUrlEncoded
@@ -394,6 +402,8 @@ internal interface ApiService {
         @Field("address") address: String,
         @Field("foursquare_id") foursquareId: String?,
         @Field("foursquare_type") foursquareType: String?,
+        @Field("google_place_id") googlePlaceId: String?,
+        @Field("google_place_type") googlePlaceType: String?,
         @Field(ApiConstants.DISABLE_NOTIFICATION) disableNotification: Boolean?,
         @Field(ApiConstants.REPLY_TO_MESSAGE_ID) replyToMessageId: Long?,
         @Field(ApiConstants.ALLOW_SENDING_WITHOUT_REPLY) allowSendingWithoutReply: Boolean?,
@@ -612,6 +622,9 @@ internal interface ApiService {
 
     @GET("logOut")
     suspend fun logOut(): CallResponse<Response<Boolean>>
+
+    @GET("close")
+    fun close(): Call<Response<Boolean>>
 
     /**
      * Updating messages

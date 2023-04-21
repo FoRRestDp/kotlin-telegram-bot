@@ -1,9 +1,7 @@
 package com.github.kotlintelegrambot.dispatcher.handlers
 
-import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.dispatcher.handlers.media.MediaHandlerEnvironment
 import com.github.kotlintelegrambot.entities.Game
-import com.github.kotlintelegrambot.entities.Update
 import com.github.kotlintelegrambot.entities.files.Animation
 import com.github.kotlintelegrambot.entities.files.Audio
 import com.github.kotlintelegrambot.entities.files.Document

@@ -13,7 +13,8 @@ public sealed class InputMessageContent {
     public data class Location(
         val latitude: Float,
         val longitude: Float,
-        @SerializedName("live_period") val livePeriod: Int? = null
+        @SerializedName("live_period") val livePeriod: Int? = null,
+        @SerializedName("proximity_alert_radius") val proximityAlertRadius: Int? = null
     ) : InputMessageContent()
 
     public data class Venue(
@@ -22,7 +23,9 @@ public sealed class InputMessageContent {
         val title: String,
         val address: String,
         @SerializedName("foursquare_id") val foursquareId: String? = null,
-        @SerializedName("foursquare_type") val foursquareType: String? = null
+        @SerializedName("foursquare_type") val foursquareType: String? = null,
+        @SerializedName("google_place_id") val googlePlaceId: String? = null,
+        @SerializedName("google_place_type") val googlePlaceType: String? = null
     ) : InputMessageContent()
 
     public data class Contact(
