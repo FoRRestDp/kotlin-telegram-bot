@@ -1,26 +1,7 @@
 package com.github.kotlintelegrambot.network
 
-import com.github.kotlintelegrambot.entities.BotCommand
-import com.github.kotlintelegrambot.entities.Chat
-import com.github.kotlintelegrambot.entities.ChatAction
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.ChatMember
-import com.github.kotlintelegrambot.entities.ChatPermissions
-import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.MessageEntity
-import com.github.kotlintelegrambot.entities.MessageId
-import com.github.kotlintelegrambot.entities.ParseMode
-import com.github.kotlintelegrambot.entities.ReplyMarkup
-import com.github.kotlintelegrambot.entities.TelegramFile
-import com.github.kotlintelegrambot.entities.TelegramFile.ByByteArray
-import com.github.kotlintelegrambot.entities.TelegramFile.ByFile
-import com.github.kotlintelegrambot.entities.TelegramFile.ByFileId
-import com.github.kotlintelegrambot.entities.TelegramFile.ByUrl
-import com.github.kotlintelegrambot.entities.Update
-import com.github.kotlintelegrambot.entities.User
-import com.github.kotlintelegrambot.entities.UserProfilePhotos
-import com.github.kotlintelegrambot.entities.WebhookInfo
+import com.github.kotlintelegrambot.entities.*
+import com.github.kotlintelegrambot.entities.TelegramFile.*
 import com.github.kotlintelegrambot.entities.dice.DiceEmoji
 import com.github.kotlintelegrambot.entities.files.File
 import com.github.kotlintelegrambot.entities.inlinequeryresults.InlineQueryResult
@@ -789,7 +770,7 @@ internal class ApiClient(
         )
     }
 
-    suspend fun sendChatAction(chatId: ChatId, action: ChatAction): CallResponse<Response<Boolean>> = runApiOperation {
+    suspend fun sendChatAction(chatId: ChatId, action: ChatAction): TelegramBotResult<Boolean> = runApiOperation {
         service.sendChatAction(chatId, action)
     }
 
@@ -913,7 +894,7 @@ internal class ApiClient(
         chatId: ChatId,
         messageId: Long,
         disableNotification: Boolean?
-    ): CallResponse<Response<Boolean>> = runApiOperation {
+    ): TelegramBotResult<Boolean> = runApiOperation {
         service.pinChatMessage(chatId, messageId, disableNotification)
     }
 
@@ -935,7 +916,7 @@ internal class ApiClient(
         )
     }
 
-    suspend fun leaveChat(chatId: ChatId): CallResponse<Response<Boolean>> = runApiOperation {
+    suspend fun leaveChat(chatId: ChatId): TelegramBotResult<Boolean> = runApiOperation {
         service.leaveChat(chatId)
     }
 
@@ -995,8 +976,7 @@ internal class ApiClient(
         return service.logOut()
     }
 
-    fun close(): Call<Response<Boolean>> {
-
+    suspend fun close(): CallResponse<Response<Boolean>> {
         return service.close()
     }
 

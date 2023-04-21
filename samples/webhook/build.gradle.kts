@@ -9,7 +9,7 @@ dependencies {
 
 val runApp by tasks.creating(JavaExec::class) {
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("com.github.kotlintelegrambot.webhook.MainKt")
+    mainClass = "com.github.kotlintelegrambot.webhook.MainKt"
 }
 
 tasks.jar {

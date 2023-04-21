@@ -14,15 +14,8 @@ java {
 }
 
 kotlin {
+    jvmToolchain(11)
     explicitApi = ExplicitApiMode.Strict
-}
-
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
 }
 
 tasks.test {
@@ -60,7 +53,7 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        register<MavenPublication>("maven") {
             group = project.group
             artifactId = project.name
             version = project.version.toString()
@@ -71,7 +64,7 @@ publishing {
     }
 }
 
-tasks.create<Wrapper>("wrapper") {
-    gradleVersion = "7.4.2"
+tasks.register<Wrapper>("wrapper") {
+    gradleVersion = "8.1"
     distributionType = Wrapper.DistributionType.ALL
 }

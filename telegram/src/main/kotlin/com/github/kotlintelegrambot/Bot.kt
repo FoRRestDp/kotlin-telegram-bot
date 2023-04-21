@@ -1,23 +1,7 @@
 package com.github.kotlintelegrambot
 
 import com.github.kotlintelegrambot.dispatcher.Dispatcher
-import com.github.kotlintelegrambot.entities.BotCommand
-import com.github.kotlintelegrambot.entities.Chat
-import com.github.kotlintelegrambot.entities.ChatAction
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.ChatMember
-import com.github.kotlintelegrambot.entities.ChatPermissions
-import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
-import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.MessageEntity
-import com.github.kotlintelegrambot.entities.MessageId
-import com.github.kotlintelegrambot.entities.ParseMode
-import com.github.kotlintelegrambot.entities.ReplyMarkup
-import com.github.kotlintelegrambot.entities.TelegramFile
-import com.github.kotlintelegrambot.entities.Update
-import com.github.kotlintelegrambot.entities.User
-import com.github.kotlintelegrambot.entities.UserProfilePhotos
-import com.github.kotlintelegrambot.entities.WebhookInfo
+import com.github.kotlintelegrambot.entities.*
 import com.github.kotlintelegrambot.entities.dice.DiceEmoji
 import com.github.kotlintelegrambot.entities.files.File
 import com.github.kotlintelegrambot.entities.inlinequeryresults.InlineQueryResult
@@ -30,16 +14,11 @@ import com.github.kotlintelegrambot.entities.polls.PollType
 import com.github.kotlintelegrambot.entities.stickers.MaskPosition
 import com.github.kotlintelegrambot.entities.stickers.StickerSet
 import com.github.kotlintelegrambot.logging.LogLevel
-import com.github.kotlintelegrambot.network.ApiClient
-import com.github.kotlintelegrambot.network.CallResponse
-import com.github.kotlintelegrambot.network.Response
-import com.github.kotlintelegrambot.network.bimap
-import com.github.kotlintelegrambot.network.call
+import com.github.kotlintelegrambot.network.*
 import com.github.kotlintelegrambot.network.serialization.GsonFactory
 import com.github.kotlintelegrambot.types.DispatchableObject
 import com.github.kotlintelegrambot.types.TelegramBotResult
 import com.github.kotlintelegrambot.updater.SuspendLooper
-import com.github.kotlintelegrambot.updater.CoroutineLooper
 import com.github.kotlintelegrambot.updater.Updater
 import com.github.kotlintelegrambot.webhook.WebhookConfig
 import com.github.kotlintelegrambot.webhook.WebhookConfigBuilder
@@ -47,8 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
 import java.net.Proxy
 import java.io.File as SystemFile
 
@@ -151,7 +128,8 @@ public class Bot private constructor(
                 webhookConfig.ipAddress,
                 webhookConfig.maxConnections,
                 webhookConfig.allowedUpdates,
-            webhookConfig.dropPendingUpdates)
+                webhookConfig.dropPendingUpdates
+            )
         }
         val webhookSet = setWebhookResult.bimap(
             mapResponse = { true },
@@ -159,7 +137,7 @@ public class Bot private constructor(
         )
 
         if (webhookSet) {
-            dispatcher.startCheckingUpdates()
+            dispatcher.launchCheckingUpdates()
         }
 
         return webhookSet
@@ -174,7 +152,7 @@ public class Bot private constructor(
             error("To stop a webhook you need to configure it on bot set up. Check the `webhook` builder function")
         }
 
-        dispatcher.stopCheckingUpdates()
+        dispatcher.cancelCheckingUpdates()
 
         val deleteWebhookResult = deleteWebhook()
 
@@ -231,7 +209,6 @@ public class Bot private constructor(
         apiClient.setWebhook(url, certificate, ipAddress, maxConnections, allowedUpdates, dropPendingUpdates)
     }
 
-    @Suppress("UNCHECKED_CAST")
     public suspend fun deleteWebhook(
         dropPendingUpdates: Boolean? = null
     ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
@@ -1066,7 +1043,7 @@ public class Bot private constructor(
             replyToMessageId,
             allowSendingWithoutReply,
             replyMarkup,
-        proximityAlertRadius
+            proximityAlertRadius
         )
     }
 
@@ -1158,7 +1135,7 @@ public class Bot private constructor(
             latitude,
             longitude,
             replyMarkup,
-        proximityAlertRadius
+            proximityAlertRadius
         )
     }
 
@@ -1200,7 +1177,7 @@ public class Bot private constructor(
             foursquareId,
             foursquareType,
             googlePlaceId,
-        googlePlaceType,disableNotification,
+            googlePlaceType, disableNotification,
             replyToMessageId,
             allowSendingWithoutReply,
             replyMarkup
@@ -1397,9 +1374,6 @@ public class Bot private constructor(
     ): Pair<CallResponse<Response<Boolean>?>?, Exception?> =
         call { apiClient.setChatDescription(chatId, description) }
 
-    fun setChatDescription(chatId: ChatId, description: String) =
-        call {apiClient.setChatDescription(chatId, description) }
-    
     /**
      * Use this method to add a message to the list of pinned messages in a chat. IF the chat is
      * not a private chat, the bot must be an administrator in the chat for this to work and must
@@ -1515,7 +1489,7 @@ public class Bot private constructor(
     /**
      * Use this method to set a new group sticker set for a supergroup. The bot must be an
      * administrator in the chat for this to work and must have the appropriate admin rights. Use
-     * the field [canSetStickerSet] optionally returned in [getChat] requests to check if the bot
+     * the field `canSetStickerSet` optionally returned in [getChat] requests to check if the bot
      * can use this method.
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup (in
@@ -1535,7 +1509,7 @@ public class Bot private constructor(
     /**
      * Use this method to delete a group sticker set from a supergroup. The bot must be an
      * administrator in the chat for this to work and must have the appropriate admin rights. Use
-     * the field [canSetStickerSet] optionally returned in [getChat] requests to check if the bot
+     * the field `canSetStickerSet` optionally returned in [getChat] requests to check if the bot
      * can use this method.
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup (in
@@ -1600,7 +1574,7 @@ public class Bot private constructor(
      * @return True on success
      * */
 
-    fun close() = apiClient.close().call()
+    public suspend fun close(): Pair<CallResponse<Response<Boolean>?>?, Exception?> = call { apiClient.close() }
 
     /**
      * Updating messages
