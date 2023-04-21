@@ -7,5 +7,5 @@ allprojects {
     apply(from = "$rootDir/ktlint.gradle")
 
     group = "com.github.forrestdp.kotlintelegrambot"
-    version = "8.0.0-alpha01"
+    version = "8.0.0-alpha02"
 }
